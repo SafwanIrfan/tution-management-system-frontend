@@ -8,6 +8,7 @@ import Modal from '../components/Modal';
 import ReportForm from '../components/ReportForm';
 import ReportView from '../components/ReportView';
 import toast from 'react-hot-toast';
+import Spinner from '../components/Spinner';
 
 const Reports = () => {
     const [reports, setReports] = useState<Report[]>([]);
@@ -114,7 +115,9 @@ const Reports = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                                        Loading reports...
+                                        <div className="flex justify-center items-center py-4">
+                                            <Spinner size="lg" />
+                                        </div>
                                     </td>
                                 </tr>
                             ) : reports.length === 0 ? (

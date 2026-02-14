@@ -26,7 +26,7 @@ const Button: React.FC<ButtonProps> = ({
         <button
             disabled={disabled || isLoading}
             className={cn(
-                "inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95",
+                "cursor-pointer inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95",
                 variants[variant],
                 variant === 'primary' && "focus:ring-indigo-500",
                 variant === 'danger' && "focus:ring-red-500",

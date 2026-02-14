@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import logo from '../assets/logo1.png';
 import {
     Users,
     CalendarCheck,
@@ -40,12 +41,10 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
         >
             <div className="p-4 flex items-center justify-between border-b border-gray-100">
                 <div className={cn("flex items-center gap-2 overflow-hidden whitespace-nowrap", collapsed && "md:justify-center md:w-full")}>
-                    <div className="bg-indigo-600 p-2 rounded-lg text-white shrink-0">
-                        <GraduationCap size={24} />
+                    <div className='w-12 h-12 p-1 bg-black rounded-full overflow-hidden'>
+                        <img src={logo} alt="HS_LOGO" className="object-cover w-full h-full" />
                     </div>
-                    {(!collapsed || isOpen) && (
-                        <span className={cn("font-bold text-xl text-indigo-900 tracking-tight", collapsed && "md:hidden")}>TuitionMS</span>
-                    )}
+
                 </div>
 
                 {/* Mobile Close Button */}
@@ -93,14 +92,6 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
                 ))}
             </nav>
 
-            <div className="p-4 border-t border-gray-100">
-                {(!collapsed || isOpen) && (
-                    <div className={cn("bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-xl", collapsed && "md:hidden")}>
-                        <p className="text-xs text-indigo-600 font-semibold uppercase mb-1">Teacher Panel</p>
-                        <p className="text-sm text-gray-600">Logged in as Admin</p>
-                    </div>
-                )}
-            </div>
         </div>
     );
 };

@@ -5,6 +5,7 @@ import Button from './Button';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { Plus, Trash2 } from 'lucide-react';
+import Spinner from './Spinner';
 
 interface ReportFormProps {
     onSubmit: () => void;
@@ -16,11 +17,13 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, onCancel, initialData
     const [students, setStudents] = useState<Student[]>([]);
     const [selectedStudentId, setSelectedStudentId] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(true);
 
     const [reportData, setReportData] = useState({
         month: new Date().toLocaleString('default', { month: 'long' }),
         year: new Date().getFullYear().toString(),
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        examName: ''
     });
 
     const [marks, setMarks] = useState<Partial<ReportMarks>[]>([
@@ -36,6 +39,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, onCancel, initialData
                 setStudents(response.data);
             } catch (error) {
                 toast.error('Failed to load students');
+            } finally {
+                setLoadingStudents(false);
             }
         };
         fetchStudents();
@@ -47,7 +52,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, onCancel, initialData
             setReportData({
                 month: initialData.month,
                 year: initialData.year,
-                date: initialData.date
+                date: initialData.date,
+                examName: initialData.examName
             });
             if (initialData.reportMarks && initialData.reportMarks.length > 0) {
                 setMarks(initialData.reportMarks.map(m => ({
@@ -140,21 +146,34 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, onCancel, initialData
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">Student</label>
-                    <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={selectedStudentId}
-                        onChange={(e) => setSelectedStudentId(e.target.value)}
-                        required
-                        disabled={!!initialData} // Check if should be disabled or not. Usually report belongs to a student.
-                    >
-                        <option value="">-- Select Student --</option>
-                        {students.map(std => (
-                            <option key={std.stdId} value={std.stdId}>
-                                {std.stdName}
-                            </option>
-                        ))}
-                    </select>
+                    {loadingStudents ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 flex items-center justify-center">
+                            <Spinner size="sm" className="mr-2" />
+                            <span className="text-sm text-gray-500">Loading students...</span>
+                        </div>
+                    ) : (
+                        <select
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            value={selectedStudentId}
+                            onChange={(e) => setSelectedStudentId(e.target.value)}
+                            required
+                            disabled={!!initialData} // Check if should be disabled or not. Usually report belongs to a student.
+                        >
+                            <option value="">-- Select Student --</option>
+                            {students.map(std => (
+                                <option key={std.stdId} value={std.stdId}>
+                                    {std.stdName}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                 </div>
+                <Input
+                    label="Exam Name"
+                    value={reportData.examName}
+                    onChange={(e) => setReportData({ ...reportData, examName: e.target.value })}
+                    required
+                />
                 <Input
                     label="Month"
                     value={reportData.month}

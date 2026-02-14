@@ -4,7 +4,8 @@ import Button from './Button';
 import { Download, X } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { cn } from '../utils';
+import { cn, formatDate } from '../utils';
+import logo from '../assets/logo1.png';
 
 interface ReportViewProps {
     report: Report;
@@ -69,8 +70,8 @@ const ReportView: React.FC<ReportViewProps> = ({ report, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto print:p-0 print:bg-white">
-            <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl relative animate-in zoom-in-95 duration-200 print:shadow-none print:max-w-none print:w-full">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:p-0 print:bg-white">
+            <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto print:shadow-none print:max-w-none print:w-full print:max-h-none print:overflow-visible">
                 <div className="absolute top-4 right-4 z-10 flex gap-2 print:hidden">
                     <Button onClick={handleDownload} isLoading={downloading}>
                         <Download size={16} className="mr-2" /> Download PDF
@@ -83,239 +84,227 @@ const ReportView: React.FC<ReportViewProps> = ({ report, onClose }) => {
                     </button>
                 </div>
 
-                <div className="p-8 md:p-12 mb-4 bg-white">
-                    <div className="text-center border-b-2 border-indigo-600 pb-6 mb-8">
-                        <h1 className="text-4xl font-bold text-indigo-900 uppercase tracking-wider mb-2">Report Card</h1>
-                        <p className="text-gray-500 font-medium tracking-widest text-sm uppercase">Tuition Management System</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-sm">
-                        <div className="space-y-3">
-                            <div className="flex">
-                                <span className="font-semibold text-gray-500 w-24">Student:</span>
-                                <span className="text-lg font-bold text-gray-900">{report.student.stdName}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="font-semibold text-gray-500 w-24">ID:</span>
-                                <span className="text-gray-900">#{report.student.stdId}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="font-semibold text-gray-500 w-24">Class:</span>
-                                <span className="text-gray-900">{report.student.classStudy}</span>
-                            </div>
-                        </div>
-                        <div className="space-y-3 text-right">
-                            <div>
-                                <span className="font-semibold text-gray-500">Month:</span>
-                                <span className="text-gray-900 font-medium ml-2">{report.month}</span>
-                            </div>
-                            <div>
-                                <span className="font-semibold text-gray-500">Year:</span>
-                                <span className="text-gray-900 font-medium ml-2">{report.year}</span>
-                            </div>
-                            <div>
-                                <span className="font-semibold text-gray-500">Date:</span>
-                                <span className="text-gray-900 font-medium ml-2">{report.date}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <table className="w-full text-left mb-8 border-collapse border border-gray-200">
-                        <thead>
-                            <tr className="bg-gray-50 text-gray-900 uppercase text-xs tracking-wider">
-                                <th className="p-3 border border-gray-200 font-semibold">Subject</th>
-                                <th className="p-3 border border-gray-200 text-right font-semibold">Max Marks</th>
-                                <th className="p-3 border border-gray-200 text-right font-semibold">Obtained</th>
-                                <th className="p-3 border border-gray-200 text-center font-semibold">Grade</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {report.reportMarks.map((sub, i) => (
-                                <tr key={i}>
-                                    <td className="p-3 border border-gray-200 font-medium text-gray-800">{sub.subjectName}</td>
-                                    <td className="p-3 border border-gray-200 text-right text-gray-600">{sub.maxMarks}</td>
-                                    <td className="p-3 border border-gray-200 text-right font-semibold text-gray-900">{sub.totalMarks}</td>
-                                    <td className="p-3 border border-gray-200 text-center">
-                                        <span className={cn(
-                                            "inline-block px-2 py-0.5 rounded text-xs font-bold",
-                                            sub.grade?.startsWith('A') ? "bg-green-100 text-green-800" :
-                                                sub.grade === 'B' ? "bg-blue-100 text-blue-800" :
-                                                    sub.grade === 'F' ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"
-                                        )}>
-                                            {sub.grade || '-'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                        <tfoot className="bg-gray-50 font-bold text-gray-900">
-                            <tr>
-                                <td className="p-3 border border-gray-200">Total</td>
-                                <td className="p-3 border border-gray-200 text-right">{totalMax}</td>
-                                <td className="p-3 border border-gray-200 text-right text-indigo-700">{totalObt}</td>
-                                <td className="p-3 border border-gray-200"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-                        <div className="text-center p-4 bg-gray-50 rounded border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Percentage</p>
-                            <p className="text-2xl font-bold text-gray-900">{percentage.toFixed(1)}%</p>
-                        </div>
-                        <div className="text-center p-4 bg-gray-50 rounded border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Overall Grade</p>
-                            <p className={cn(
-                                "text-3xl font-extrabold",
-                                finalGrade.startsWith('A') ? "text-green-600" :
-                                    finalGrade === 'F' ? "text-red-600" : "text-indigo-600"
-                            )}>{finalGrade}</p>
-                        </div>
-                        <div className="text-center p-4 bg-gray-50 rounded border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Remarks</p>
-                            <p className="font-semibold text-gray-900 mt-1">
-                                {finalGrade.startsWith('A') ? "Excellent Work!" :
-                                    finalGrade === 'B' ? "Very Good!" :
-                                        finalGrade === 'C' ? "Good Job!" :
-                                            finalGrade === 'F' ? "Needs Hard Work" : "Satisfactory"}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-between items-end mt-20">
-                        <div className="text-center w-40">
-                            <div className="border-b border-gray-400 mb-2"></div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase">Teacher Signature</p>
-                        </div>
-                        <div className="text-center w-40">
-                            <div className="border-b border-gray-400 mb-2"></div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase">Principal Signature</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Hidden Print Template with Inline Styles */}
-            <div style={{ position: 'absolute', top: -9999, left: -9999 }}>
-                <div ref={printRef} style={{ width: '210mm', minHeight: '297mm', padding: '15mm', backgroundColor: '#ffffff', fontFamily: 'sans-serif', color: '#111827' }}>
-
+                <div className="p-12 mt-8 bg-white flex flex-col items-center">
                     {/* Header */}
-                    <div style={{ textAlign: 'center', borderBottom: '2px solid #4f46e5', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
-                        <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#312e81', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', margin: 0 }}>Report Card</h1>
-                        <p style={{ color: '#6b7280', fontWeight: 500, letterSpacing: '0.1em', fontSize: '0.875rem', textTransform: 'uppercase', margin: 0 }}>Tuition Management System</p>
+                    <div className="text-center mb-10 w-full">
+                        <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-widest mb-2">Report Card</h1>
+                        <div className="h-1 w-full bg-indigo-600 mx-auto rounded-full"></div>
+                        <p className="text-gray-500 text-xl font-semibold uppercase tracking-widest mt-3">HS Learning Center</p>
+                        <p className="text-gray-400 text-sm font-semibold uppercase tracking-wider mt-1">{report.examName}</p>
                     </div>
 
-                    {/* Student Info */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '0.875rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <div style={{ display: 'flex' }}>
-                                <span style={{ fontWeight: 600, color: '#6b7280', width: '6rem' }}>Student:</span>
-                                <span style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#111827' }}>{report.student.stdName}</span>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <span style={{ fontWeight: 600, color: '#6b7280', width: '6rem' }}>ID:</span>
-                                <span style={{ color: '#111827' }}>#{report.student.stdId}</span>
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <span style={{ fontWeight: 600, color: '#6b7280', width: '6rem' }}>Class:</span>
-                                <span style={{ color: '#111827' }}>{report.student.classStudy}</span>
-                            </div>
+                    {/* Student Info Grid */}
+                    <div className="w-full grid grid-cols-2 gap-x-12 gap-y-6 mb-10 text-sm border-b border-gray-100 pb-10">
+                        <div className="grid grid-cols-[80px_1fr] gap-y-2 items-baseline">
+                            <span className="text-gray-500 font-semibold uppercase text-xs tracking-wide">Student</span>
+                            <span className="text-gray-900 font-bold text-lg">{report.student.stdName}</span>
+
+                            <span className="text-gray-500 font-semibold uppercase text-xs tracking-wide">ID</span>
+                            <span className="text-gray-900 font-medium">{report.student.stdId}</span>
+
+                            <span className="text-gray-500 font-semibold uppercase text-xs tracking-wide">Class</span>
+                            <span className="text-gray-900 font-medium">{report.student.classStudy}</span>
                         </div>
-                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <div>
-                                <span style={{ fontWeight: 600, color: '#6b7280' }}>Month:</span>
-                                <span style={{ color: '#111827', fontWeight: 500, marginLeft: '0.5rem' }}>{report.month}</span>
-                            </div>
-                            <div>
-                                <span style={{ fontWeight: 600, color: '#6b7280' }}>Year:</span>
-                                <span style={{ color: '#111827', fontWeight: 500, marginLeft: '0.5rem' }}>{report.year}</span>
-                            </div>
-                            <div>
-                                <span style={{ fontWeight: 600, color: '#6b7280' }}>Date:</span>
-                                <span style={{ color: '#111827', fontWeight: 500, marginLeft: '0.5rem' }}>{report.date}</span>
+                        <div className="grid grid-cols-[80px_1fr] gap-y-2 items-baseline text-right justify-items-end content-start">
+                            {/* Wrapper div to force right alignment in the grid cell */}
+                            <div className="col-span-2 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 items-baseline w-full">
+                                <span className="text-gray-500 font-semibold uppercase text-xs tracking-wide">Month</span>
+                                <span className="text-gray-900 font-medium">{report.month}</span>
+
+                                <span className="text-gray-500 font-semibold uppercase text-xs tracking-wide">Date</span>
+                                <span className="text-gray-900 font-medium">{formatDate(report.date)}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Marks Table */}
-                    <table style={{ width: '100%', textAlign: 'left', marginBottom: '2rem', borderCollapse: 'collapse', border: '1px solid #e5e7eb' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#f9fafb', color: '#111827', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
-                                <th style={{ padding: '0.75rem', border: '1px solid #e5e7eb', fontWeight: 600 }}>Subject</th>
-                                <th style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right', fontWeight: 600 }}>Max Marks</th>
-                                <th style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right', fontWeight: 600 }}>Obtained</th>
-                                <th style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'center', fontWeight: 600 }}>Grade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {report.reportMarks.map((sub, i) => (
-                                <tr key={i} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                    <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', fontWeight: 500, color: '#1f2937' }}>{sub.subjectName}</td>
-                                    <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right', color: '#4b5563' }}>{sub.maxMarks}</td>
-                                    <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right', fontWeight: 600, color: '#111827' }}>{sub.totalMarks}</td>
-                                    <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                                        <span style={{
-                                            display: 'inline-block',
-                                            padding: '0.125rem 0.5rem',
-                                            borderRadius: '0.25rem',
-                                            fontSize: '0.75rem',
-                                            fontWeight: 'bold',
-                                            backgroundColor: getGradeBg(sub.grade || ''),
-                                            color: getGradeColor(sub.grade || '')
-                                        }}>
-                                            {sub.grade || '-'}
-                                        </span>
-                                    </td>
+                    <div className="w-full mb-10">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="border-b-2 border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
+                                    <th className="py-4 font-semibold text-center w-1/4">Subject</th>
+                                    <th className="py-4 font-semibold text-center w-1/4">Max Marks</th>
+                                    <th className="py-4 font-semibold text-center w-1/4">Obtained</th>
+                                    <th className="py-4 font-semibold text-center w-1/4">Grade</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                        <tfoot style={{ backgroundColor: '#f9fafb', fontWeight: 'bold', color: '#111827' }}>
-                            <tr>
-                                <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb' }}>Total</td>
-                                <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right' }}>{totalMax}</td>
-                                <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb', textAlign: 'right', color: '#4338ca' }}>{totalObt}</td>
-                                <td style={{ padding: '0.75rem', border: '1px solid #e5e7eb' }}></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {report.reportMarks.map((sub, i) => (
+                                    <tr key={i} className="border-b border-gray-50">
+                                        <td className="py-4 text-center text-gray-900 font-medium">{sub.subjectName}</td>
+                                        <td className="py-4 text-center text-gray-500">{sub.maxMarks}</td>
+                                        <td className="py-4 text-center text-gray-900 font-semibold">{sub.totalMarks}</td>
+                                        <td className="py-4 text-center">
+                                            <div className="flex justify-center">
+                                                <span className="text-gray-900 font-semibold">
+                                                    {sub.grade || '-'}
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr className="border-t-2 border-gray-100">
+                                    <td className="py-6 text-center font-bold text-gray-900 uppercase text-xs tracking-wider">Total</td>
+                                    <td className="py-6 text-center font-bold text-gray-900">{totalMax}</td>
+                                    <td className="py-6 text-center font-bold text-indigo-600 text-lg">{totalObt}</td>
+                                    <td className="py-6"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
-                    {/* Summary Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '3rem' }}>
-                        <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.25rem', border: '1px solid #f3f4f6' }}>
-                            <p style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', marginTop: 0 }}>Percentage</p>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', margin: 0 }}>{percentage.toFixed(1)}%</p>
+                    {/* Summary Footer */}
+                    <div className="w-full grid grid-cols-3 gap-4 mb-16">
+                        <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg">
+                            <span className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Percentage</span>
+                            <span className="text-xl font-bold text-gray-900">{percentage.toFixed(1)}%</span>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.25rem', border: '1px solid #f3f4f6' }}>
-                            <p style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', marginTop: 0 }}>Overall Grade</p>
-                            <p style={{
-                                fontSize: '1.875rem',
-                                fontWeight: 800,
-                                margin: 0,
-                                color: finalGrade.startsWith('A') ? '#16a34a' : finalGrade === 'F' ? '#dc2626' : '#4f46e5'
-                            }}>{finalGrade}</p>
+                        <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg">
+                            <span className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Grade</span>
+                            <span className={cn(
+                                "text-2xl font-extrabold",
+                                finalGrade.startsWith('A') ? "text-green-600" :
+                                    finalGrade === 'F' ? "text-red-600" : "text-indigo-600"
+                            )}>
+                                {finalGrade}
+                            </span>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.25rem', border: '1px solid #f3f4f6' }}>
-                            <p style={{ fontSize: '0.75rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', marginTop: 0 }}>Remarks</p>
-                            <p style={{ fontWeight: 600, color: '#111827', marginTop: '0.25rem', margin: 0 }}>
+                        <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg">
+                            <span className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Remarks</span>
+                            <span className="text-sm font-semibold text-gray-900 text-center">
                                 {finalGrade.startsWith('A') ? "Excellent Work!" :
                                     finalGrade === 'B' ? "Very Good!" :
                                         finalGrade === 'C' ? "Good Job!" :
                                             finalGrade === 'F' ? "Needs Hard Work" : "Satisfactory"}
-                            </p>
+                            </span>
                         </div>
                     </div>
 
-                    {/* Signatures */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '5rem' }}>
-                        <div style={{ textAlign: 'center', width: '10rem' }}>
-                            <div style={{ borderBottom: '1px solid #9ca3af', marginBottom: '0.5rem' }}></div>
-                            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', margin: 0 }}>Teacher Signature</p>
+                    <p className="text-center text-gray-500 text-sm font-semibold uppercase tracking-widest mt-3">Issue by Admin HS_LC</p>
+
+                </div>
+            </div>
+
+            {/* Hidden Print Template */}
+            <div style={{ position: 'absolute', top: -9999, left: -9999 }}>
+                <div ref={printRef} style={{ width: '210mm', minHeight: '297mm', padding: '15mm', backgroundColor: '#ffffff', fontFamily: 'sans-serif', color: '#111827' }}>
+
+                    {/* PDF Header */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '3rem' }}>
+
+                        {/* Logo and Institute Name */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div style={{ width: '34px', height: '34px', padding: '3px', backgroundColor: 'black', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '0.75rem' }}>
+                                <img src={logo} alt="HS_LOGO" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                            </div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#111827', margin: 0 }}>
+                                HS Learning Center
+                            </h2>
                         </div>
-                        <div style={{ textAlign: 'center', width: '10rem' }}>
-                            <div style={{ borderBottom: '1px solid #9ca3af', marginBottom: '0.5rem' }}></div>
-                            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', margin: 0 }}>Principal Signature</p>
+
+                        {/* Divider */}
+                        <div style={{ height: '4px', width: '100%', backgroundColor: '#4f46e5', borderRadius: '9999px', marginBottom: '1.5rem' }}></div>
+
+                        {/* Title and Exam Name */}
+                        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem', color: '#111827' }}>Report Card</h1>
+                        <p style={{ fontSize: '1rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#6b7280', margin: 0 }}>
+                            {report.examName}
+                        </p>
+                    </div>
+
+                    {/* PDF Info */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3rem', borderBottom: '1px solid #f3f4f6', paddingBottom: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', rowGap: '0.5rem', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>Student</span>
+                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827' }}>{report.student.stdName}</span>
+
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>ID</span>
+                            <span style={{ fontWeight: 500, color: '#111827' }}>{report.student.stdId}</span>
+
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>Class</span>
+                            <span style={{ fontWeight: 500, color: '#111827' }}>{report.student.classStudy}</span>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', columnGap: '1rem', rowGap: '0.5rem', alignItems: 'baseline', textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>Month</span>
+                            <span style={{ fontWeight: 500, color: '#111827' }}>{report.month}</span>
+
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>Date</span>
+                            <span style={{ fontWeight: 500, color: '#111827' }}>{formatDate(report.date)}</span>
                         </div>
                     </div>
+
+                    {/* PDF Table */}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '3rem' }}>
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #f3f4f6', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280' }}>
+                                <th style={{ padding: '1rem 0', fontWeight: 600, textAlign: 'center', width: '25%' }}>Subject</th>
+                                <th style={{ padding: '1rem 0', fontWeight: 600, textAlign: 'center', width: '25%' }}>Max Marks</th>
+                                <th style={{ padding: '1rem 0', fontWeight: 600, textAlign: 'center', width: '25%' }}>Obtained</th>
+                                <th style={{ padding: '1rem 0', fontWeight: 600, textAlign: 'center', width: '25%' }}>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {report.reportMarks.map((sub, i) => (
+                                <tr key={i} style={{ borderBottom: '1px solid #f9fafb' }}>
+                                    <td style={{ padding: '1rem 0', textAlign: 'center', fontWeight: 500, color: '#111827' }}>{sub.subjectName}</td>
+                                    <td style={{ padding: '1rem 0', textAlign: 'center', color: '#6b7280' }}>{sub.maxMarks}</td>
+                                    <td style={{ padding: '1rem 0', textAlign: 'center', fontWeight: 600, color: '#111827' }}>{sub.totalMarks}</td>
+                                    <td style={{ padding: '1rem 0', textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                            <span style={{
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2rem', height: '2rem', borderRadius: '0.25rem', fontSize: '0.75rem', fontWeight: 'bold',
+
+                                                color: getGradeColor(sub.grade || '')
+                                            }}>
+                                                {sub.grade || '-'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            <tr style={{ borderTop: '2px solid #f3f4f6' }}>
+                                <td style={{ padding: '1.5rem 0', textAlign: 'center', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#111827' }}>Total</td>
+                                <td style={{ padding: '1.5rem 0', textAlign: 'center', fontWeight: 'bold', color: '#111827' }}>{totalMax}</td>
+                                <td style={{ padding: '1.5rem 0', textAlign: 'center', fontWeight: 'bold', fontSize: '1.125rem', color: '#4f46e5' }}>{totalObt}</td>
+                                <td style={{ padding: '1.5rem 0' }}></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    {/* PDF Summary */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: '0.25rem' }}>Percentage</span>
+                            <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#111827' }}>{percentage.toFixed(1)}%</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: '0.25rem' }}>Grade</span>
+                            <span style={{
+                                fontSize: '1.5rem', fontWeight: 800,
+                                color: finalGrade.startsWith('A') ? '#16a34a' : finalGrade === 'F' ? '#dc2626' : '#4f46e5'
+                            }}>
+                                {finalGrade}
+                            </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: '0.25rem' }}>Remarks</span>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111827' }}>
+                                {finalGrade.startsWith('A') ? "Excellent Work!" :
+                                    finalGrade === 'B' ? "Very Good!" :
+                                        finalGrade === 'C' ? "Good Job!" :
+                                            finalGrade === 'F' ? "Needs Hard Work" : "Satisfactory"}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p style={{ fontSize: '0.75rem', color: '#72777eff', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: '0.25rem', textAlign: 'center' }}>Issue by Admin HS_LC</p>
+
+
                 </div>
             </div>
         </div>

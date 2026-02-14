@@ -3,9 +3,8 @@ export interface Student {
     stdName: string;
     fatherName: string;
     phoneNo: string;
-    classStudy: number;
+    classStudy: string;
     groupName: string;
-    classesPerWeek: number;
     paymentOption: string;
     monthlyFee: number;
 }
@@ -20,7 +19,6 @@ export interface Attendance {
 export interface Fees {
     feesId?: number;
     student: Student;
-    issuedBy: string;
     month: string;
     date: string;
     paymentMode: 'Cash' | 'Online';
@@ -40,8 +38,14 @@ export interface ReportMarks {
 export interface Report {
     repId?: number;
     student: Student;
+    examName: string;
     reportMarks: ReportMarks[];
     month: string;
     date: string;
     year: string;
+}
+
+export interface AttendanceDTO {
+    date: string;
+    isPresent: number;
 }

@@ -7,6 +7,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import { cn } from '../utils';
+import Spinner from '../components/Spinner';
 
 interface AttendanceState {
     status: number;
@@ -243,7 +244,15 @@ const Attendance = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {!dataLoaded ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
+                                        <div className="flex justify-center items-center">
+                                            <Spinner size="lg" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : !dataLoaded ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
                                         <div className="flex flex-col items-center gap-2">

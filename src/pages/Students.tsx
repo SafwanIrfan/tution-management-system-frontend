@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Eye } from 'lucide-react';
 import api from '../services/api';
 import type { Student } from '../types';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
 import StudentForm from '../components/StudentForm';
+import StudentDetails from '../components/StudentDetails';
+import Spinner from '../components/Spinner';
 import toast from 'react-hot-toast';
 
 const Students = () => {
@@ -13,6 +15,7 @@ const Students = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+    const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -125,7 +128,9 @@ const Students = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
-                                        Loading students...
+                                        <div className="flex justify-center items-center py-4">
+                                            <Spinner size="lg" />
+                                        </div>
                                     </td>
                                 </tr>
                             ) : filteredStudents.length === 0 ? (
@@ -137,7 +142,7 @@ const Students = () => {
                             ) : (
                                 filteredStudents.map((student) => (
                                     <tr key={student.stdId} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-gray-900">#{student.stdId}</td>
+                                        <td className="px-6 py-4 font-medium text-gray-900">{student.stdId}</td>
                                         <td className="px-6 py-4">{student.stdName}</td>
                                         <td className="px-6 py-4">{student.fatherName}</td>
                                         <td className="px-6 py-4">{student.phoneNo}</td>
@@ -166,6 +171,13 @@ const Students = () => {
                                             >
                                                 <Trash2 size={16} />
                                             </button>
+                                            <button
+                                                onClick={() => setViewingStudent(student)}
+                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
+                                                title="View Details"
+                                            >
+                                                <Eye size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -188,6 +200,19 @@ const Students = () => {
                     onCancel={() => setIsModalOpen(false)}
                     isLoading={submitLoading}
                 />
+            </Modal>
+
+            <Modal
+                isOpen={!!viewingStudent}
+                onClose={() => setViewingStudent(null)}
+                title="Student Attendance Details"
+            >
+                {viewingStudent && (
+                    <StudentDetails
+                        student={viewingStudent}
+                        onClose={() => setViewingStudent(null)}
+                    />
+                )}
             </Modal>
         </div>
     );

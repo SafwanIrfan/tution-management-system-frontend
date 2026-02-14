@@ -25,7 +25,7 @@ const Layout = () => {
             <main className="flex-1 overflow-auto w-full relative">
                 {/* Mobile Header */}
                 <div className="md:hidden p-4 bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
-                    <div className="font-bold text-lg text-indigo-900">TuitionMS</div>
+                    <div className="font-bold text-lg text-indigo-900">HS Learning Center</div>
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
                         className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"

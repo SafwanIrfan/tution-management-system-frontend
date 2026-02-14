@@ -9,6 +9,9 @@ import Input from '../components/Input';
 import Modal from '../components/Modal';
 import FeeForm from '../components/FeeForm';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo1.png';
+import { formatDate } from '../utils';
+import Spinner from '../components/Spinner';
 
 const FeesPage = () => {
     const [fees, setFees] = useState<Fees[]>([]);
@@ -167,7 +170,9 @@ const FeesPage = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                                        Loading history...
+                                        <div className="flex justify-center items-center py-4">
+                                            <Spinner size="lg" />
+                                        </div>
                                     </td>
                                 </tr>
                             ) : filteredFees.length === 0 ? (
@@ -180,7 +185,7 @@ const FeesPage = () => {
                                 filteredFees.map((fee) => (
                                     <tr key={fee.feesId} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 font-medium text-indigo-600">#{fee.feesId}</td>
-                                        <td className="px-6 py-4">{fee.date}</td>
+                                        <td className="px-6 py-4">{formatDate(fee.date)}</td>
                                         <td className="px-6 py-4 font-medium text-gray-900">
                                             {fee.student?.stdName}
                                         </td>
@@ -193,7 +198,6 @@ const FeesPage = () => {
                                             {fee.amount}Rs
                                         </td>
                                         <td className="px-6 py-4">{fee.paymentMode}</td>
-                                        <td className="px-6 py-4 text-gray-400 text-xs uppercase">{fee.issuedBy}</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2 text-xs">
                                                 <button
@@ -244,45 +248,146 @@ const FeesPage = () => {
             {/* Hidden Receipt Template for PDF Generation */}
             {receiptData && (
                 <div style={{ position: 'absolute', top: -9999, left: -9999 }}>
-                    <div ref={receiptRef} style={{ width: '148mm', minHeight: '100mm', padding: '2rem', backgroundColor: '#ffffff', color: '#111827', fontFamily: 'sans-serif' }}>
-                        <div style={{ textAlign: 'center', borderBottom: '2px solid #4f46e5', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', textTransform: 'uppercase', color: '#312e81', letterSpacing: '0.05em', margin: 0 }}>Fee Receipt</h2>
-                            <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: 500, letterSpacing: '0.025em', borderTop: '1px solid #e5e7eb', display: 'inline-block', marginTop: '0.25rem', paddingTop: '0.25rem', paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>TUITION MANAGEMENT SYSTEM</p>
+                    <div
+                        ref={receiptRef}
+                        style={{
+                            width: '148mm',
+                            minHeight: '100mm',
+                            padding: '2rem',
+                            backgroundColor: '#ffffff',
+                            color: '#111827',
+                            fontFamily: 'sans-serif'
+                        }}
+                    >
+
+                        {/* Header */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+
+                            {/* Logo and Institute Name */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                                <div style={{ width: '32px', height: '32px', padding: '3px', backgroundColor: 'black', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '0.75rem' }}>
+                                    <img src={logo} alt="HS_LOGO" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                                </div>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#111827', margin: 0 }}>
+                                    HS Learning Center
+                                </h2>
+                            </div>
+
+                            {/* Divider */}
+                            <div style={{ height: '3px', width: '100%', backgroundColor: '#4f46e5', borderRadius: '9999px', marginBottom: '1rem' }}></div>
+
+                            {/* Title */}
+                            <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#312e81', margin: 0 }}>
+                                Fee Receipt
+                            </h1>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600, width: '5rem', display: 'inline-block' }}>Receipt No:</span> <span style={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#111827', fontSize: '1.125rem' }}>#{receiptData.feesId}</span></p>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600, width: '5rem', display: 'inline-block' }}>Date:</span> <span>{receiptData.date}</span></p>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600, width: '5rem', display: 'inline-block' }}>Issued By:</span> <span style={{ textTransform: 'uppercase' }}>{receiptData.issuedBy}</span></p>
+                        {/* ===== STUDENT + RECEIPT INFO (UPDATED ALIGNMENT) ===== */}
+                        <div style={{ marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+
+                            {/* Row 1 */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                <div>
+                                    <span style={{ fontWeight: 600, color: '#6b7280' }}>Name: </span>
+                                    <span style={{ fontWeight: 'bold', color: '#111827' }}>
+                                        {receiptData.student?.stdName}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span style={{ fontWeight: 600, color: '#6b7280' }}>Receipt No: </span>
+                                    <span style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                        #{receiptData.feesId}
+                                    </span>
+                                </div>
                             </div>
-                            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600 }}>Student Name:</span> <span style={{ fontWeight: 'bold', fontSize: '1.125rem', color: '#111827', display: 'block' }}>{receiptData.student?.stdName}</span></p>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600 }}>Student ID:</span> <span>{receiptData.student?.stdId}</span></p>
-                                <p style={{ margin: 0 }}><span style={{ color: '#6b7280', fontWeight: 600 }}>Class:</span> <span>{receiptData.student?.classStudy}</span></p>
+
+                            {/* Row 2 */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                <div>
+                                    <span style={{ fontWeight: 600, color: '#6b7280' }}>Student ID: </span>
+                                    {receiptData.student?.stdId}
+                                </div>
+
+                                <div>
+                                    <span style={{ fontWeight: 600, color: '#6b7280' }}>Date: </span>
+                                    {formatDate(receiptData.date)}
+                                </div>
                             </div>
+
+                            {/* Row 3 */}
+                            <div>
+                                <span style={{ fontWeight: 600, color: '#6b7280' }}>Class: </span>
+                                {receiptData.student?.classStudy}
+                            </div>
+
+
+
                         </div>
 
+                        {/* ===== FEE TABLE (UNCHANGED) ===== */}
                         <div style={{ marginBottom: '2rem' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
-                                <thead style={{ backgroundColor: '#f3f4f6', color: '#111827', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                                <thead
+                                    style={{
+                                        backgroundColor: '#f3f4f6',
+                                        color: '#111827',
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.75rem'
+                                    }}
+                                >
                                     <tr>
-                                        <th style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'left' }}>Description</th>
-                                        <th style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'right' }}>Amount</th>
+                                        <th style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'left' }}>
+                                            Description
+                                        </th>
+                                        <th style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'right' }}>
+                                            Amount
+                                        </th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <tr>
                                         <td style={{ padding: '0.75rem', border: '1px solid #d1d5db' }}>
-                                            Tuition Fee for <span style={{ fontWeight: 'bold' }}>{receiptData.month}</span>
+                                            Tuition Fee for <strong>{receiptData.month}</strong>
                                         </td>
-                                        <td style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'right', fontWeight: 'bold', color: '#111827' }}>
+
+                                        <td
+                                            style={{
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
                                             {receiptData.amount} Rs
                                         </td>
                                     </tr>
+
                                     <tr>
-                                        <td style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'right', fontWeight: 'bold', backgroundColor: '#f9fafb' }}>Total Paid</td>
-                                        <td style={{ padding: '0.75rem', border: '1px solid #d1d5db', textAlign: 'right', fontWeight: 'bold', color: '#4338ca', backgroundColor: '#f9fafb', fontSize: '1.125rem' }}>
+                                        <td
+                                            style={{
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold',
+                                                backgroundColor: '#f9fafb'
+                                            }}
+                                        >
+                                            Total Paid
+                                        </td>
+
+                                        <td
+                                            style={{
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                textAlign: 'right',
+                                                fontWeight: 'bold',
+                                                color: '#4338ca',
+                                                backgroundColor: '#f9fafb',
+                                                fontSize: '1.125rem'
+                                            }}
+                                        >
                                             {receiptData.amount} Rs
                                         </td>
                                     </tr>
@@ -290,18 +395,35 @@ const FeesPage = () => {
                             </table>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: '#6b7280', marginTop: '3rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
+                        {/* ===== FOOTER (UNCHANGED) ===== */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                fontSize: '0.75rem',
+                                color: '#6b7280',
+                                marginTop: '3rem',
+                                paddingTop: '1rem',
+                                borderTop: '1px solid #e5e7eb'
+                            }}
+                        >
                             <div>
-                                <p style={{ margin: 0 }}>Payment Mode: <span style={{ fontWeight: 600, color: '#111827', textTransform: 'uppercase' }}>{receiptData.paymentMode}</span></p>
+                                Payment Mode:{' '}
+                                <span style={{ fontWeight: 600, color: '#111827', textTransform: 'uppercase' }}>
+                                    {receiptData.paymentMode}
+                                </span>
                             </div>
+
                             <div style={{ textAlign: 'right' }}>
-                                <p style={{ marginBottom: '1rem', margin: 0 }}>Signature</p>
-                                <div style={{ width: '8rem', borderBottom: '1px solid #9ca3af', marginTop: '2.5rem' }}></div>
+                                <p style={{ marginBottom: '1rem', margin: 0 }}>Issued By Admin HS_LC</p>
                             </div>
                         </div>
+
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

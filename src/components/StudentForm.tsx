@@ -16,9 +16,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ initialData, onSubmit, onCanc
         stdName: '',
         fatherName: '',
         phoneNo: '',
-        classStudy: 0,
+        classStudy: "",
         groupName: '',
-        classesPerWeek: 0,
         paymentOption: '',
         monthlyFee: 0
     });
@@ -88,7 +87,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ initialData, onSubmit, onCanc
                 <Input
                     label="Class"
                     name="classStudy"
-                    type="number"
+                    type="string"
                     value={formData.classStudy || ''}
                     onChange={handleChange}
                     required
@@ -105,15 +104,6 @@ const StudentForm: React.FC<StudentFormProps> = ({ initialData, onSubmit, onCanc
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Input
-                    label="Classes/Week"
-                    name="classesPerWeek"
-                    type="number"
-                    value={formData.classesPerWeek || ''}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. 5"
-                />
                 <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">Payment Option</label>
                     <select

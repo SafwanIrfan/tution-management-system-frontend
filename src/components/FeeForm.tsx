@@ -4,6 +4,7 @@ import Input from './Input';
 import Button from './Button';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import Spinner from './Spinner';
 
 interface FeeFormProps {
     onSubmit: () => void;
@@ -20,9 +21,9 @@ const FeeForm: React.FC<FeeFormProps> = ({ onSubmit, onCancel, isLoading, initia
         month: new Date().toLocaleString('default', { month: 'long' }),
         date: new Date().toISOString().split('T')[0],
         paymentMode: 'Cash',
-        issuedBy: 'Admin'
     });
     const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+    const [loadingStudents, setLoadingStudents] = useState(true);
 
     useEffect(() => {
         const fetchStudents = async () => {
@@ -31,6 +32,8 @@ const FeeForm: React.FC<FeeFormProps> = ({ onSubmit, onCancel, isLoading, initia
                 setStudents(response.data);
             } catch (error) {
                 toast.error('Failed to load students');
+            } finally {
+                setLoadingStudents(false);
             }
         };
         fetchStudents();
@@ -44,7 +47,6 @@ const FeeForm: React.FC<FeeFormProps> = ({ onSubmit, onCancel, isLoading, initia
                 month: initialData.month,
                 date: initialData.date,
                 paymentMode: initialData.paymentMode,
-                issuedBy: initialData.issuedBy
             });
             if (initialData.student) {
                 setSelectedStudentId(initialData.student.stdId || '');
@@ -111,19 +113,26 @@ const FeeForm: React.FC<FeeFormProps> = ({ onSubmit, onCancel, isLoading, initia
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 block">Select Student</label>
-                <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={selectedStudentId}
-                    onChange={(e) => setSelectedStudentId(e.target.value)}
-                    required
-                >
-                    <option value="">-- Select Student --</option>
-                    {students.map(std => (
-                        <option key={std.stdId} value={std.stdId}>
-                            {std.stdName} (ID: {std.stdId})
-                        </option>
-                    ))}
-                </select>
+                {loadingStudents ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 flex items-center justify-center">
+                        <Spinner size="sm" className="mr-2" />
+                        <span className="text-sm text-gray-500">Loading students...</span>
+                    </div>
+                ) : (
+                    <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={selectedStudentId}
+                        onChange={(e) => setSelectedStudentId(e.target.value)}
+                        required
+                    >
+                        <option value="">-- Select Student --</option>
+                        {students.map(std => (
+                            <option key={std.stdId} value={std.stdId}>
+                                {std.stdName} (ID: {std.stdId})
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,13 +175,6 @@ const FeeForm: React.FC<FeeFormProps> = ({ onSubmit, onCancel, isLoading, initia
                     </select>
                 </div>
             </div>
-
-            <Input
-                label="Issued By"
-                name="issuedBy"
-                value={formData.issuedBy}
-                onChange={handleChange}
-            />
 
             <div className="flex justify-end gap-3 mt-6">
                 <Button type="button" variant="secondary" onClick={onCancel}>

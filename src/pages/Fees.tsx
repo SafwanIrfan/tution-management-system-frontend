@@ -416,7 +416,7 @@ const FeesPage = () => {
                             </div>
 
                             <div style={{ textAlign: 'right' }}>
-                                <p style={{ marginBottom: '1rem', margin: 0 }}>Issued By Admin HS_LC</p>
+                                <p style={{ marginBottom: '1rem', margin: 0 }}>Issued By: Admin HS_LC</p>
                             </div>
                         </div>
 
